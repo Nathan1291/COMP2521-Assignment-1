@@ -1,0 +1,108 @@
+
+========================================================================
+                          Complexity Analysis
+========================================================================
+
+NOTE:
+- Your time complexities should be in big-O notation.
+- For MsetUnion, MsetIntersection, MsetIncluded and MsetEquals, your
+  time complexities should be in terms of n and m, where n and m are the
+  number of distinct elements in each of the multisets respectively.
+- For MsetMostCommon, your time complexity should be in terms of n and k,
+  where n is the number of distinct elements in the given multiset and k
+  is the given value of k.
+
+
+---------
+MsetUnion
+---------
+
+Worst case time complexity: O((n+m)log(n+m))
+
+Explanation:
+Mset union in and of iself is quite a simple function, it creates a new Mset, which runs in constant time, then calls insert union twice then returns that created Mset.
+The complexity of the function is equivalent to the compelxity of insert union. InsertUnion is a function that travels through all nodes in a given multiset,
+and calls the insertNodeUnion function each time it travels. Therefore the complexity of the function thus far would be a combination of the 2 complexities,
+O(n*x) and O(m*x), given that x is the time complexity of the function insertNodeUnion. since these functions are not compounded, the current time complexity would be
+O((n+m)*x). InsertNodeUnion is a function that inserts a node into the given bst, but slightly alters the logic to suit the union logic. It does call a few helper functions
+such as leftRotate, getHeight, getBalance, and max, but those functions all run within constant time and therefore do not alter the logic of the function, resulting in
+InsertNodeUnion running within O(logn) time. Therefore the function as a whole as a worst case scenario runs within O((n+m)log(n+m)) time.
+
+----------------
+MsetIntersection
+----------------
+
+Worst case time complexity: O(n*log(n*m))
+
+Explanation:
+Similarly to MsetUnion, this function is quite simply on the surface, it creates a new Mset, which runs in constant time, then calls the insertIntersection function, then returns
+the new Mset. Therefore the complexity of the function depends on the insert intersection time. This function spans each node of the first given multiset, which would go through all
+n nodes of the first multiset, and checks to see if this node exists within the second multiset. if this node exists, we take the smaller of the 2 then we insert it into the newly created
+multiset. Since this node runs the searching function and the insertion of the nodes n times, we can calculate that the search takes O(logm) time and the insertion takes O(logn) time to determine that
+the worst case time complexity will be around O(n*log(n*m)).
+
+------------
+MsetIncluded
+------------
+
+Worst case time complexity: O(log(n*m))
+
+Explanation:
+this functions is much simpler than the others covered so far since we do not need to worry about the time complexityt involved with inserting nodes into a newly created multiset.
+We can see this through the function simply retunring the result of checkIncluded. Thus the complexity of this function depends only on the complexity of checkIncluded. CheckIncluded
+is a function that goes through all n nodes of the first multiset, then searches to see if that node exists in the second set. if it is not found the function returns false, and
+if the count of a given node in the first set is larger than the count of the node in the second set, it returns false. both of these comparisons run in constant time so we can elect to
+ignore their complexities. therefore, we only need to consider the searching function that is conducted for all n nodes of the first set. the searching function goes thorugh all m nodes,
+so it runs within O(logm) time, and since it is conducted for all n nodes of the first set, we can determine that the final time complexity results in O(log(n*m)).
+
+----------
+MsetEquals
+----------
+
+Worst case time complexity: O(log(n*m))
+
+Explanation:
+As the time complexity of MsetIncluded has already been explained above, the complexity of MsetEquals is very easy to calculate. This function simply calls the MsetIncluded function twice,
+in order to determine if they are included going both ways, and if they are, then the 2 sets would be equal. since we call the MsetIncluded function twice, and do not call anything else,
+the time complexity is derived from MsetIncluded, which would result in a final time complexity of O(log(n*m)).
+
+--------------
+MsetMostCommon
+--------------
+
+Worst case time complexity: O(n^2)
+
+Explanation:
+MsetMostCommon is one of the more complicated methods that was created. due to the peculiar nature of having to search through the nodes by their count, i decided to utilise a separate
+linked list in order to keep everything structured. there may be more efficient methods to complete this task more directly, but i prefer this linked list method as if a another function
+existed which asked for similar requirements, we would be able to reuse the functions made for the linked list in order to generate an answer, sacrificing speed for reusability. there
+are 3 main functions which we need to determine complexities for within this function, MsetInsertList, getCommon and freeList. We do not need to worry about linkedListNew as it
+runs within constanttime. MsetInsertList is a function that spans through all n nodes wihtin a given linked list, and performs the functoin linkedListInsert on them. The function
+linkedListInsert is a function that inserts the information of a node within a specific order according to the task, which at worst runs at O(n) time, having to go through the whole
+linked list. Therefore, the time complexity of MsetInsertList will be O(n^2). getCommon is a simpler function, it starts at the end of the linked list and works it's way backwards,
+completing the information in the array items as it goes along. Since we have stored the position of the tail of the linked list, the time complexity of this function is simply
+how many nodes of the linked list we need to traverse, which would be k, resulting in a final time complexity of O(k). FreeList is simply a function that goes throughout the entire
+linked list and progressively frees the nodes, resulting in a time complexity of O(n). thus the combined time complexity of the total function is largely derived from the MsetInsertList
+function, which would be O(n^2).
+
+========================================================================
+               Design Documentation for Cursor Operations
+========================================================================
+
+If you completed the cursor operations, you must explain the design and
+implementation of your solution here.
+
+The design of the cursor operations simply entailed adding on a previous and next property onto the node struct in order to simulate the operations of a linked list within the bst itself.
+In order to keep all the functions running wihtin constant time, i also needed to add some more properties such as the first and last node property, in order to reduce time associated
+with looking up the first and last nodes in order to add a start and end node to them. To simulate the start and end node, i simply added another node to both the largest and the smallest
+node value of the tree using next and prev, containing values which were negative in order to indicate they were not normal nodes. since these nodes were not linked using the usual
+left and right of the tree, when traversing the tree they did not appear, but when utilising the linked list next and prev, they did. The structure cursor had 3 main properties, tracking
+the current node that cursor was on as well as a pointer to the start and end nodes in order to keep the free function within constant time. After implementing these solutions, the only
+problem left to tackle was dealing with the logic of next and prev when inserting the nodes in order to keep it within constant time. luckily, the structure of a binary search tree
+helps a lot when creating an ordered linked list in order to keep the insertion function at a time complexity of O(logn). when inserting a node, we can simply check for certain properties
+in order to determine how next and prev functions. we are inserting to the left of a current node without a previous property, we can simply link the 2 nodes together,
+pointing to and from each other with next and prev. if it already has a prev property, we need to do a bit of a switch around with the 3 nodes, the current node, the node we are inserting
+and the previous node that the current points to. switching these around we can keep the logic of a next and prev property in order to keep a ascending order within the tree
+stable. we do similar logic with inserting into the right function, pointing to each other if the node does not have a next property but switching the values around if the node doest have
+a next property. In doing so, we are able to keep a interconnected doubly linked list implementation within the original bst which allows for traversal in ascending order as well as keeping
+all the cursor functions in constant time.
